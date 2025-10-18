@@ -1,0 +1,62 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### H2 Database ###
+data/
+*.db
+*.mv.db
+*.trace.db
+
+### Logs ###
+logs/
+*.log
+
+### Environment Variables ###
+.env
+.env.local
+
+### Uploaded Files ###
+uploads/
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### SSH Keys (보안) ###
+*.pem
+*.key
+ssh-key-*
+
+### TEST Data SET ###
+test_json/

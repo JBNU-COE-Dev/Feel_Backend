@@ -1,0 +1,44 @@
+[
+  {
+    "title": "2025학년도 신입생 환영회 안내",
+    "content": "2025년 3월 5일 공대 강당에서 신입생 환영회가 열립니다. 많은 참석 부탁드립니다.",
+    "author": "FeeL 학생회장",
+    "isPinned": true,
+    "category": "일반공지"
+  },
+  {
+    "title": "중간고사 일정 안내",
+    "content": "2025학년도 1학기 중간고사는 4월 15일부터 4월 19일까지 진행됩니다.",
+    "author": "학사관리팀",
+    "isPinned": true,
+    "category": "학사공지"
+  },
+  {
+    "title": "공과대학 체육대회 개최",
+    "content": "5월 10일 학교 운동장에서 공과대학 체육대회가 열립니다. 각 학과별로 참가 신청 바랍니다.",
+    "author": "FeeL 부학생회장",
+    "isPinned": false,
+    "category": "일반공지"
+  },
+  {
+    "title": "삼성전자 채용설명회",
+    "content": "6월 1일 삼성전자 채용설명회가 공대 강당에서 진행됩니다. 취업 준비생은 필참해주세요.",
+    "author": "취업지원센터",
+    "isPinned": false,
+    "category": "취업정보"
+  },
+  {
+    "title": "전기전자공학부 세미나 안내",
+    "content": "7월 5일 AI 기술 트렌드에 관한 특별 세미나가 개최됩니다.",
+    "author": "전기전자공학부",
+    "isPinned": false,
+    "category": "학과소식"
+  },
+  {
+    "title": "산학협력 프로젝트 공고",
+    "content": "2025학년도 1학기 산학협력 프로젝트 참가 팀을 모집합니다.",
+    "author": "사업단",
+    "isPinned": false,
+    "category": "사업단공지"
+  }
+]

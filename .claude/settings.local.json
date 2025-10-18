@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/scheoleon/workspace/**)",
+      "Bash(./mvnw:*)",
+      "Bash(mvn clean:*)",
+      "Bash(mvn test:*)",
+      "Bash(curl -X POST http://localhost:8080/api/notices -F \"title=다섯번째 공지사항\" -F \"content=테스트 이미지가 포함된 공지사항입니다.\" -F \"author=관리자\" -F \"isPinned=false\" -F \"category=일반공지\" -F \"image=@C:/Users/scheoleon/workspace/FeeL_Backend/test_img.jpg\")",
+      "Bash(curl:*)",
+      "Bash(test:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker exec:*)",
+      "Bash(mkdir:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

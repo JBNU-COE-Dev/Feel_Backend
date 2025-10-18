@@ -1,0 +1,30 @@
+# Google App Engine 배포 설정 파일
+# App Engine Standard Environment - Java 17
+
+runtime: java17
+instance_class: F2
+
+# 환경 변수 설정
+env_variables:
+  SPRING_PROFILES_ACTIVE: "prod"
+  DB_USERNAME: "feel"
+  # DB_PASSWORD는 Google Secret Manager 사용 권장
+
+# 자동 스케일링 설정
+automatic_scaling:
+  min_instances: 0
+  max_instances: 2
+  target_cpu_utilization: 0.65
+
+# 엔트리포인트 설정
+entrypoint: java -jar target/backend-0.0.1-SNAPSHOT.jar
+
+# 핸들러 설정
+handlers:
+- url: /.*
+  script: auto
+  secure: optional
+
+# Cloud SQL 연결 (선택사항)
+# beta_settings:
+#   cloud_sql_instances: PROJECT_ID:REGION:INSTANCE_NAME
