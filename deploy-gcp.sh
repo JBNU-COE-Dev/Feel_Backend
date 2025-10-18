@@ -57,19 +57,45 @@ echo -e "${YELLOW}포트 8080, 3307 개방 확인${NC}"
 
 # 5. 애플리케이션 디렉토리 설정
 echo -e "${YELLOW}[5/8] 애플리케이션 디렉토리 설정...${NC}"
-APP_DIR="/home/$USER/feel-backend"
-mkdir -p $APP_DIR
-cd $APP_DIR
+
+# 스크립트가 실행되는 현재 디렉토리를 APP_DIR로 설정
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+APP_DIR="$SCRIPT_DIR"
+
+echo -e "${GREEN}작업 디렉토리: $APP_DIR${NC}"
+cd "$APP_DIR"
 
 # 6. .env 파일 확인
 echo -e "${YELLOW}[6/8] 환경 변수 설정 확인...${NC}"
+echo -e "${YELLOW}현재 디렉토리: $(pwd)${NC}"
+echo -e "${YELLOW}.env 파일 검색 중...${NC}"
+
 if [ ! -f .env ]; then
     echo -e "${RED}ERROR: .env 파일이 없습니다.${NC}"
-    echo -e "${YELLOW}.env.production을 복사하여 .env 파일을 생성하고 데이터베이스 비밀번호를 설정하세요.${NC}"
-    echo -e "${YELLOW}예시: cp .env.production .env && nano .env${NC}"
+    echo -e "${YELLOW}현재 디렉토리: $(pwd)${NC}"
+    echo -e "${YELLOW}파일 목록:${NC}"
+    ls -la .env* 2>/dev/null || echo "  .env* 파일이 없습니다."
+    echo ""
+    echo -e "${YELLOW}다음 중 하나를 실행하세요:${NC}"
+
+    if [ -f .env.gcp ]; then
+        echo -e "${GREEN}  cp .env.gcp .env && nano .env${NC}"
+    elif [ -f .env.production ]; then
+        echo -e "${GREEN}  cp .env.production .env && nano .env${NC}"
+    else
+        echo -e "${YELLOW}  cat > .env << 'EOF'
+DB_USERNAME=feel
+DB_PASSWORD=CHANGE_THIS_PASSWORD
+SPRING_PROFILES_ACTIVE=prod
+EOF${NC}"
+        echo -e "${YELLOW}  nano .env  # 비밀번호 변경${NC}"
+    fi
     exit 1
 fi
+
 echo -e "${GREEN}.env 파일 확인 완료${NC}"
+echo -e "${YELLOW}.env 파일 내용 (비밀번호 제외):${NC}"
+grep -v PASSWORD .env || cat .env
 
 # 7. 기존 컨테이너 중지 및 제거
 echo -e "${YELLOW}[7/8] 기존 컨테이너 정리...${NC}"
