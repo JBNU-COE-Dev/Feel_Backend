@@ -19,7 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://localhost:3000",
                 "https://m-se0k.github.io",
                 "https://m-se0k.github.io/FeeL_WEB"
-                // 배포 후 서버 IP를 추가하세요: "http://YOUR_SERVER_IP:3000"
+                "http://34.50.30.56:3000"
             )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
@@ -32,7 +32,7 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://localhost:3000",
                 "https://m-se0k.github.io",
                 "https://m-se0k.github.io/FeeL_WEB"
-                // 배포 후 서버 IP를 추가하세요: "http://YOUR_SERVER_IP:3000"
+                "http://34.50.30.56:3000"
             )
             .allowedMethods("GET", "OPTIONS")
             .allowedHeaders("*")
