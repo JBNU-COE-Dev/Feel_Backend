@@ -362,7 +362,7 @@ public void addCorsMappings(CorsRegistry registry) {
             "http://localhost:3000",
             "https://m-se0k.github.io",
             "https://m-se0k.github.io/FeeL_WEB",
-            "http://YOUR_EXTERNAL_IP:3000"  // GCP 외부 IP 추가
+            "http://34.64.189.241:3000"  // GCP 외부 IP 추가
         )
         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
         .allowedHeaders("*")

@@ -81,13 +81,13 @@ curl -X POST http://localhost:8080/api/notices \
 
 ### 2. 고정 공지 + 이미지
 ```bash
-curl -X POST http://localhost:8080/api/notices \
+curl -X POST http://34.64.189.241:8080/api/gallery \
   -F "title=긴급 공지 (이미지 포함)" \
   -F "content=반드시 확인해주세요!" \
   -F "author=학생회장" \
   -F "isPinned=true" \
-  -F "category=긴급공지" \
-  -F "image=@C:/Users/scheoleon/workspace/FeeL_Backend/test_img.jpg"
+  -F "category=행사" \
+  -F "image=@/home/cheoleooon/Feel_Backend/test_img.jpg"
 ```
 
 ### 3. 다양한 카테고리 + 이미지

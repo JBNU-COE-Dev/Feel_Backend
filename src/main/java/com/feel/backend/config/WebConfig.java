@@ -19,7 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://localhost:3000",
                 "https://m-se0k.github.io",
                 "https://m-se0k.github.io/FeeL_WEB"
-                "http://34.50.30.56:3000"
+                "http://34.64.189.241:3000"
             )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
@@ -32,7 +32,7 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://localhost:3000",
                 "https://m-se0k.github.io",
                 "https://m-se0k.github.io/FeeL_WEB"
-                "http://34.50.30.56:3000"
+                "http://34.64.189.241:3000"
             )
             .allowedMethods("GET", "OPTIONS")
             .allowedHeaders("*")
