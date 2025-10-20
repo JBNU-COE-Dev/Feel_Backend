@@ -77,7 +77,7 @@ docker-compose run --rm certbot certonly \
   --agree-tos \
   --no-eff-email \
   --dry-run \
-  -d http://lovesade.duckdns.org
+  -d lovesade.duckdns.org
 ```
 
 ### 방법 2: 실제 인증서 발급
@@ -85,13 +85,13 @@ docker-compose run --rm certbot certonly \
 테스트가 성공하면 실제 인증서 발급:
 
 ```bash
-docker-compose run --rm certbot certonly \
+docker-compose run --rm --entrypoint certbot certbot certonly \
   --webroot \
   --webroot-path=/var/www/certbot \
   --email cheoleooon@gmail.com \
   --agree-tos \
   --no-eff-email \
-  -d http://lovesade.duckdns.org
+  -d lovesade.duckdns.org
 ```
 
 **중요**: 
