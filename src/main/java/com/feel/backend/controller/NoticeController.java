@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/notices")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "https://m-se0k.github.io", "https://m-se0k.github.io/FeeL_WEB"})
 public class NoticeController {
 
     private final NoticeService noticeService;
