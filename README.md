@@ -97,26 +97,26 @@ docker-compose down -v
 
 #### 1. 이미지 없는 공지사항 생성 (JSON)
 ```bash
-curl -X POST http://localhost:8080/api/notices \
+curl -X POST http://https://jbnu-coe.github.io/api/notices \
   -H "Content-Type: application/json" \
   -d '{
     "title": "2024 FeeL 정기총회 안내",
     "content": "2024년도 정기총회를 다음과 같이 개최합니다.\n일시: 2024년 3월 15일\n장소: 공대 7호관 강당",
     "author": "학생회장",
     "isPinned": true,
-    "category": "공지"
+    "category": "학과소식"
   }'
 ```
 
 #### 2. 이미지 포함 공지사항 생성 (Multipart Form)
 ```bash
-curl -X POST http://localhost:8080/api/notices \
+curl -X POST https://lovesade.duckdns.org/api/notices \
   -F "title=봄 축제 포스터" \
   -F "content=2024 FeeL 봄 축제가 열립니다!" \
   -F "author=홍보부장" \
   -F "isPinned=false" \
-  -F "category=행사" \
-  -F "image=@/path/to/poster.jpg"
+  -F "category=학과소식" \
+  -F "image=@C:\Users\scheoleon\workspace\JBNU-COE.github.io\public\feel_logo.png"
 ```
 
 #### 3. 전체 공지사항 조회 (페이징)
@@ -151,13 +151,13 @@ curl "http://localhost:8080/api/notices/search?keyword=축제&category=행사&pa
 
 #### 9. 공지사항 수정 (이미지 포함)
 ```bash
-curl -X PUT http://localhost:8080/api/notices/1 \
-  -F "title=수정된 제목" \
+curl -X PUT https://lovesade.duckdns.org/api/notices/ \
+  -F "title=수" \
   -F "content=수정된 내용" \
   -F "author=관리자" \
   -F "isPinned=true" \
-  -F "category=공지" \
-  -F "image=@/path/to/new_image.jpg"
+  -F "category=학사공지" \
+  -F "image=C:\Users\scheoleon\workspace\JBNU-COE.github.io\public\feel_logo.png"
 ```
 
 #### 10. 공지사항 삭제
