@@ -17,6 +17,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/api/**")
             .allowedOrigins(
                 "http://localhost:3000",
+                "http://localhost:3001",
                 "https://m-se0k.github.io",
                 "https://m-se0k.github.io/FeeL_WEB",
                 "https://jbnu-coe.github.io",
