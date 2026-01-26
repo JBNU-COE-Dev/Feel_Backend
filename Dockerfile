@@ -1,30 +1,36 @@
-# Multi-stage build for Spring Boot application
-
-# Stage 1: Build
+# 1. 빌드 스테이지
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copy pom.xml and download dependencies
+# 의존성 파일 먼저 복사하여 캐싱 활용
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-# Copy source code and build
+# 소스 코드 복사 및 패키징
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Stage 2: Run
+# 2. 실행 스테이지
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Copy jar from build stage
+# 시스템에 필요한 도구 설치 (curl: 헬스체크용)
+RUN apk add --no-cache curl
+
+# 파일 업로드 디렉토리 준비
+RUN mkdir -p /app/uploads && chmod 755 /app/uploads
+
+# 빌드된 JAR 파일 복사
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose port
+# 환경 변수 기본값 설정 (컨테이너 실행 시 오버라이딩 가능)
+ENV SPRING_PROFILES_ACTIVE=prod
+ENV TZ=Asia/Seoul
+
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+# 서비스 상태 체크 (실제 존재하는 엔드포인트여야 함)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:8080/api/notices?page=0&size=1 || exit 1
 
-# Run application
 ENTRYPOINT ["java", "-jar", "app.jar"]
