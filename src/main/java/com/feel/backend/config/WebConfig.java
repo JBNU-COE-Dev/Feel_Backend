@@ -16,16 +16,12 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
             .allowedOrigins(
+                "http://feel-test.com",
+                "https://feel-test.com",
+                "http://admin.feel-test.com",
+                "https://admin.feel-test.com",
                 "http://localhost:3000",
-                "http://localhost:3001",
-                "https://m-se0k.github.io",
-                "https://m-se0k.github.io/FeeL_WEB",
-                "https://jbnu-coe.github.io",
-                "http://34.64.189.241:3000",
-                "http://34.64.189.241",
-                "https://34.64.189.241",
-                "http://lovesade.duckdns.org",
-                "https://lovesade.duckdns.org"
+                "https://localhost:3000"
             )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
@@ -35,14 +31,12 @@ public class WebConfig implements WebMvcConfigurer {
         // 업로드된 이미지 파일 접근을 위한 CORS 설정
         registry.addMapping("/uploads/**")
             .allowedOrigins(
+                "http://feel-test.com",
+                "https://feel-test.com",
+                "http://admin.feel-test.com",
+                "https://admin.feel-test.com",
                 "http://localhost:3000",
-                "https://m-se0k.github.io",
-                "https://m-se0k.github.io/FeeL_WEB",
-                "http://34.64.189.241:3000",
-                "http://34.64.189.241",
-                "https://34.64.189.241",
-                "http://lovesade.duckdns.org",
-                "https://lovesade.duckdns.org"
+                "https://localhost:3000"
             )
             .allowedMethods("GET", "OPTIONS")
             .allowedHeaders("*")
