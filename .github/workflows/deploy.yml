@@ -1,8 +1,9 @@
-name: Backend Deploy
+name: Deploy Backend
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -11,14 +12,13 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_KEY }}
-          port: ${{ secrets.SERVER_PORT }}
+          host: ${{ secrets.JCLOUD_SSH_HOST }}
+          username: ${{ secrets.JCLOUD_SSH_USER }}
+          key: ${{ secrets.JCLOUD_SSH_KEY }}
+          port: ${{ secrets.JCLOUD_SSH_PORT }}
           script: |
-            cd ~/workspace # 루트 디렉토리로 이동
-            cd Feel_Backend
+            set -e
+            cd /home/ubuntu/Feel_Backend
             git pull origin main
-            cd ..
-            docker-compose up -d --build backend
-            docker image prune -f
+            docker compose -f /home/ubuntu/docker-compose.yml build backend
+            docker compose -f /home/ubuntu/docker-compose.yml up -d --no-deps --build backend
