@@ -1,0 +1,24 @@
+name: Backend Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd ~/workspace # 루트 디렉토리로 이동
+            cd Feel_Backend
+            git pull origin main
+            cd ..
+            docker-compose up -d --build backend
+            docker image prune -f
