@@ -1,0 +1,24 @@
+name: Deploy Feel Backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.JCLOUD_SSH_HOST }}
+          username: ${{ secrets.JCLOUD_SSH_USER }}
+          key: ${{ secrets.JCLOUD_SSH_KEY }}
+          port: ${{ secrets.JCLOUD_SSH_PORT }}
+          script: |
+            set -e
+            cd /home/ubuntu/Feel_Backend
+            git pull origin main
+            docker compose -f /home/ubuntu/docker-compose.yml build backend
+            docker compose -f /home/ubuntu/docker-compose.yml up -d --no-deps --build backend
