@@ -21,7 +21,9 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://admin.feel-test.com",
                 "https://admin.feel-test.com",
                 "http://localhost:3000",
-                "https://localhost:3000"
+                "https://localhost:3000",
+                "http://feel-test.113.198.66.98.nip.io",
+                "http://admin.feel-test.113.198.66.98.nip.io"
             )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
@@ -36,7 +38,9 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://admin.feel-test.com",
                 "https://admin.feel-test.com",
                 "http://localhost:3000",
-                "https://localhost:3000"
+                "https://localhost:3000",
+                "http://feel-test.113.198.66.98.nip.io",
+                "http://admin.feel-test.113.198.66.98.nip.io"
             )
             .allowedMethods("GET", "OPTIONS")
             .allowedHeaders("*")
