@@ -67,7 +67,6 @@ public class MatchingService {
             .thumbnailUrl(defaultIfBlank(requestDto.getThumbnail(), DEFAULT_THUMBNAIL))
             .organizerId(defaultIfNull(requestDto.getOrganizerId(), 1L))
             .organizerName(defaultIfBlank(requestDto.getOrganizerName(), DEFAULT_ORGANIZER_NAME))
-            .organizerLogoUrl(requestDto.getOrganizerLogo())
             .companyType(requestDto.getCompanyType())
             .targetAudience(requestDto.getTargetAudience())
             .applicationStart(parseDisplayDate(requestDto.getApplicationStart()))
@@ -75,11 +74,7 @@ public class MatchingService {
             .activityPeriod(requestDto.getActivityPeriod())
             .recruitCount(requestDto.getRecruitCount())
             .activityArea(requestDto.getActivityArea())
-            .preferredSkills(requestDto.getPreferredSkills())
             .homepage(requestDto.getHomepage())
-            .benefits(requestDto.getBenefits())
-            .additionalBenefits(requestDto.getAdditionalBenefits())
-            .tagsInterest(joinTags(requestDto.getTagsInterest()))
             .tagsActivity(joinTags(requestDto.getTagsActivity()))
             .viewCount(0)
             .bookmarkCount(0)
@@ -104,7 +99,6 @@ public class MatchingService {
         post.setThumbnailUrl(defaultIfBlank(requestDto.getThumbnail(), post.getThumbnailUrl()));
         post.setOrganizerId(defaultIfNull(requestDto.getOrganizerId(), post.getOrganizerId()));
         post.setOrganizerName(defaultIfBlank(requestDto.getOrganizerName(), post.getOrganizerName()));
-        post.setOrganizerLogoUrl(requestDto.getOrganizerLogo());
         post.setCompanyType(requestDto.getCompanyType());
         post.setTargetAudience(requestDto.getTargetAudience());
         post.setApplicationStart(parseDisplayDate(requestDto.getApplicationStart()));
@@ -112,11 +106,7 @@ public class MatchingService {
         post.setActivityPeriod(requestDto.getActivityPeriod());
         post.setRecruitCount(requestDto.getRecruitCount());
         post.setActivityArea(requestDto.getActivityArea());
-        post.setPreferredSkills(requestDto.getPreferredSkills());
         post.setHomepage(requestDto.getHomepage());
-        post.setBenefits(requestDto.getBenefits());
-        post.setAdditionalBenefits(requestDto.getAdditionalBenefits());
-        post.setTagsInterest(joinTags(requestDto.getTagsInterest()));
         post.setTagsActivity(joinTags(requestDto.getTagsActivity()));
 
         return toResponseDto(post);
@@ -144,7 +134,6 @@ public class MatchingService {
             .thumbnail(defaultIfBlank(post.getThumbnailUrl(), DEFAULT_THUMBNAIL))
             .organizerId(post.getOrganizerId())
             .organizerName(defaultIfBlank(post.getOrganizerName(), DEFAULT_ORGANIZER_NAME))
-            .organizerLogo(post.getOrganizerLogoUrl())
             .companyType(post.getCompanyType())
             .targetAudience(post.getTargetAudience())
             .applicationStart(formatDisplayDate(post.getApplicationStart()))
@@ -152,11 +141,7 @@ public class MatchingService {
             .activityPeriod(post.getActivityPeriod())
             .recruitCount(post.getRecruitCount())
             .activityArea(post.getActivityArea())
-            .preferredSkills(post.getPreferredSkills())
             .homepage(post.getHomepage())
-            .benefits(post.getBenefits())
-            .additionalBenefits(post.getAdditionalBenefits())
-            .tagsInterest(splitTags(post.getTagsInterest()))
             .tagsActivity(splitTags(post.getTagsActivity()))
             .build();
     }

@@ -43,7 +43,7 @@ public class MatchingPost {
     @Column
     private LocalDate deadline;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String thumbnailUrl;
 
     @Column
@@ -51,9 +51,6 @@ public class MatchingPost {
 
     @Column(length = 100)
     private String organizerName;
-
-    @Column(length = 500)
-    private String organizerLogoUrl;
 
     @Column(length = 100)
     private String companyType;
@@ -77,19 +74,7 @@ public class MatchingPost {
     private String activityArea;
 
     @Column(length = 500)
-    private String preferredSkills;
-
-    @Column(length = 500)
     private String homepage;
-
-    @Column(length = 500)
-    private String benefits;
-
-    @Column(length = 500)
-    private String additionalBenefits;
-
-    @Column(length = 500)
-    private String tagsInterest;
 
     @Column(length = 500)
     private String tagsActivity;

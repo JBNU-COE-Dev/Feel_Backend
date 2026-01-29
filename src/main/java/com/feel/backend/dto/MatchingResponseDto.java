@@ -23,7 +23,6 @@ public class MatchingResponseDto {
     private String thumbnail;
     private Long organizerId;
     private String organizerName;
-    private String organizerLogo;
     private String companyType;
     private String targetAudience;
     private String applicationStart;
@@ -31,10 +30,6 @@ public class MatchingResponseDto {
     private String activityPeriod;
     private String recruitCount;
     private String activityArea;
-    private String preferredSkills;
     private String homepage;
-    private String benefits;
-    private String additionalBenefits;
-    private List<String> tagsInterest;
     private List<String> tagsActivity;
 }
