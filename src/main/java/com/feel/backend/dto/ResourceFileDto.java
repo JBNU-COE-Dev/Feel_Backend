@@ -3,6 +3,7 @@ package com.feel.backend.dto;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ResourceFileDto {
 
@@ -15,6 +16,8 @@ public class ResourceFileDto {
         private String category;
         private String title;
         private String description;
+        private Integer year;
+        private Integer month;
     }
 
     @Getter
@@ -31,6 +34,28 @@ public class ResourceFileDto {
         private Long fileSize;
         private String title;
         private String description;
+        private Integer year;
+        private Integer month;
         private LocalDateTime createdAt;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AvailablePeriods {
+        private List<Integer> years;
+        private List<MonthData> months;
+
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
+        public static class MonthData {
+            private Integer year;
+            private List<Integer> months;
+        }
     }
 }
