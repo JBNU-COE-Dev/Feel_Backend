@@ -12,10 +12,10 @@ RUN mvn clean package -DskipTests
 
 # 2. 실행 스테이지
 # 배포용
-# FROM eclipse-temurin:17-jre-alpine (인텔칩 전용)
+FROM eclipse-temurin:17-jre-alpine (인텔칩 전용)
 
 # 로컬 개발용(Windows && Mac)
-FROM eclipse-temurin:17-jre 
+#FROM eclipse-temurin:17-jre 
 WORKDIR /app
 
 # 시스템에 필요한 도구 설치 (curl: 헬스체크용)
