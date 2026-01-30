@@ -28,10 +28,12 @@ public class ResourceFileController {
             @RequestParam String category,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String description,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month,
             @RequestParam MultipartFile file
     ) {
         ResourceFileDto.Response response = resourceFileService.uploadFile(
-                category, title, description, file
+                category, title, description, year, month, file
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -45,10 +47,12 @@ public class ResourceFileController {
             @RequestParam String category,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String description,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month,
             @RequestParam List<MultipartFile> files
     ) {
         List<ResourceFileDto.Response> responses = files.stream()
-                .map(file -> resourceFileService.uploadFile(category, title, description, file))
+                .map(file -> resourceFileService.uploadFile(category, title, description, year, month, file))
                 .toList();
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
@@ -121,5 +125,47 @@ public class ResourceFileController {
                 "gallery", resourceFileService.getCountByCategory("gallery"),
                 "study-support", resourceFileService.getCountByCategory("study-support")
         ));
+    }
+
+    /**
+     * 연도/월별 파일 목록 조회
+     * GET /api/resources/by-period?category=inspection&year=2026&month=1
+     */
+    @GetMapping("/by-period")
+    public ResponseEntity<List<ResourceFileDto.Response>> getFilesByPeriod(
+            @RequestParam String category,
+            @RequestParam Integer year,
+            @RequestParam(required = false) Integer month
+    ) {
+        List<ResourceFileDto.Response> files;
+        if (month != null) {
+            files = resourceFileService.getFilesByCategoryAndYearMonth(category, year, month);
+        } else {
+            files = resourceFileService.getFilesByCategoryAndYear(category, year);
+        }
+        return ResponseEntity.ok(files);
+    }
+
+    /**
+     * 카테고리별 사용 가능한 연도 목록
+     * GET /api/resources/available-years?category=inspection
+     */
+    @GetMapping("/available-years")
+    public ResponseEntity<List<Integer>> getAvailableYears(@RequestParam String category) {
+        List<Integer> years = resourceFileService.getAvailableYears(category);
+        return ResponseEntity.ok(years);
+    }
+
+    /**
+     * 카테고리/연도별 사용 가능한 월 목록
+     * GET /api/resources/available-months?category=inspection&year=2026
+     */
+    @GetMapping("/available-months")
+    public ResponseEntity<List<Integer>> getAvailableMonths(
+            @RequestParam String category,
+            @RequestParam Integer year
+    ) {
+        List<Integer> months = resourceFileService.getAvailableMonths(category, year);
+        return ResponseEntity.ok(months);
     }
 }
