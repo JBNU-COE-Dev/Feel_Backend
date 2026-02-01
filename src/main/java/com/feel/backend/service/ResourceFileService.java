@@ -51,6 +51,8 @@ public class ResourceFileService {
             String category,
             String title,
             String description,
+            Integer year,
+            Integer month,
             MultipartFile file
     ) {
         // 카테고리 유효성 검사
@@ -97,10 +99,23 @@ public class ResourceFileService {
                 .fileSize(file.getSize())
                 .title(title)
                 .description(description)
+                .year(year)
+                .month(month)
                 .build();
 
         ResourceFile saved = resourceFileRepository.save(resourceFile);
         return toResponse(saved);
+    }
+
+    // 이전 버전 호환 (year, month 없이 호출 시)
+    @Transactional
+    public ResourceFileDto.Response uploadFile(
+            String category,
+            String title,
+            String description,
+            MultipartFile file
+    ) {
+        return uploadFile(category, title, description, null, null, file);
     }
 
     public Page<ResourceFileDto.Response> getFilesByCategory(String category, int page, int size) {
@@ -148,6 +163,39 @@ public class ResourceFileService {
         return resourceFileRepository.countByCategory(category);
     }
 
+    // 연도/월별 조회
+    public List<ResourceFileDto.Response> getFilesByCategoryAndYearMonth(
+            String category, Integer year, Integer month) {
+        if (!VALID_CATEGORIES.contains(category)) {
+            throw new IllegalArgumentException("유효하지 않은 카테고리입니다: " + category);
+        }
+
+        List<ResourceFile> files = resourceFileRepository
+                .findByCategoryAndYearAndMonthOrderByCreatedAtDesc(category, year, month);
+        return files.stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    // 연도별 조회
+    public List<ResourceFileDto.Response> getFilesByCategoryAndYear(String category, Integer year) {
+        if (!VALID_CATEGORIES.contains(category)) {
+            throw new IllegalArgumentException("유효하지 않은 카테고리입니다: " + category);
+        }
+
+        List<ResourceFile> files = resourceFileRepository
+                .findByCategoryAndYearOrderByMonthDescCreatedAtDesc(category, year);
+        return files.stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    // 카테고리별 사용 가능한 연도 목록
+    public List<Integer> getAvailableYears(String category) {
+        return resourceFileRepository.findDistinctYearsByCategory(category);
+    }
+
+    // 카테고리/연도별 사용 가능한 월 목록
+    public List<Integer> getAvailableMonths(String category, Integer year) {
+        return resourceFileRepository.findDistinctMonthsByCategoryAndYear(category, year);
+    }
+
     private String getExtension(String fileName) {
         if (fileName == null || !fileName.contains(".")) {
             return "";
@@ -165,6 +213,8 @@ public class ResourceFileService {
                 .fileSize(file.getFileSize())
                 .title(file.getTitle())
                 .description(file.getDescription())
+                .year(file.getYear())
+                .month(file.getMonth())
                 .createdAt(file.getCreatedAt())
                 .build();
     }

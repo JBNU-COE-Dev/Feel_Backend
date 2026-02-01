@@ -43,6 +43,12 @@ public class ResourceFile {
     @Column(length = 500)
     private String description;
 
+    @Column(name = "report_year")
+    private Integer year;
+
+    @Column(name = "report_month")
+    private Integer month;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
