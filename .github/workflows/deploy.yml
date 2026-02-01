@@ -22,8 +22,8 @@ jobs:
               git fetch origin main
               git reset --hard origin/main
               
-              if docker compose build --no-cache backend; then
-                docker compose up -d --force-recreate admin-front
+              if docker compose build --no-cache backend then
+                docker compose up -d --force-recreate backend
                 docker image prune -f
             else
                 exit 1
