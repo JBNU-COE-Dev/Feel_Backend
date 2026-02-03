@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -48,6 +49,10 @@ public class ResourceFile {
 
     @Column(name = "report_month")
     private Integer month;
+
+    /** 행사일 (갤러리 등). 사용자 화면에는 이 날짜만 표시 */
+    @Column(name = "event_date")
+    private LocalDate eventDate;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

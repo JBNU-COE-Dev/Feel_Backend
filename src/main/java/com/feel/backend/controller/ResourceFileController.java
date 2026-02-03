@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -30,10 +31,11 @@ public class ResourceFileController {
             @RequestParam(required = false) String description,
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate eventDate,
             @RequestParam MultipartFile file
     ) {
         ResourceFileDto.Response response = resourceFileService.uploadFile(
-                category, title, description, year, month, file
+                category, title, description, year, month, eventDate, file
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -49,10 +51,11 @@ public class ResourceFileController {
             @RequestParam(required = false) String description,
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate eventDate,
             @RequestParam List<MultipartFile> files
     ) {
         List<ResourceFileDto.Response> responses = files.stream()
-                .map(file -> resourceFileService.uploadFile(category, title, description, year, month, file))
+                .map(file -> resourceFileService.uploadFile(category, title, description, year, month, eventDate, file))
                 .toList();
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
@@ -91,6 +94,19 @@ public class ResourceFileController {
     public ResponseEntity<ResourceFileDto.Response> getFileById(@PathVariable Long id) {
         ResourceFileDto.Response file = resourceFileService.getFileById(id);
         return ResponseEntity.ok(file);
+    }
+
+    /**
+     * 리소스 메타 수정 (제목, 설명, 행사일)
+     * PATCH /api/resources/{id}
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<ResourceFileDto.Response> updateFileMeta(
+            @PathVariable Long id,
+            @RequestBody ResourceFileDto.UpdateRequest request
+    ) {
+        ResourceFileDto.Response response = resourceFileService.updateFileMeta(id, request);
+        return ResponseEntity.ok(response);
     }
 
     /**

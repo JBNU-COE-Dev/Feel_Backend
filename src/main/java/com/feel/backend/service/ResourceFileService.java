@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,6 +54,7 @@ public class ResourceFileService {
             String description,
             Integer year,
             Integer month,
+            LocalDate eventDate,
             MultipartFile file
     ) {
         // 카테고리 유효성 검사
@@ -101,13 +103,26 @@ public class ResourceFileService {
                 .description(description)
                 .year(year)
                 .month(month)
+                .eventDate(eventDate)
                 .build();
 
         ResourceFile saved = resourceFileRepository.save(resourceFile);
         return toResponse(saved);
     }
 
-    // 이전 버전 호환 (year, month 없이 호출 시)
+    // 이전 버전 호환 (year, month, eventDate 없이 호출 시)
+    @Transactional
+    public ResourceFileDto.Response uploadFile(
+            String category,
+            String title,
+            String description,
+            Integer year,
+            Integer month,
+            MultipartFile file
+    ) {
+        return uploadFile(category, title, description, year, month, null, file);
+    }
+
     @Transactional
     public ResourceFileDto.Response uploadFile(
             String category,
@@ -115,7 +130,23 @@ public class ResourceFileService {
             String description,
             MultipartFile file
     ) {
-        return uploadFile(category, title, description, null, null, file);
+        return uploadFile(category, title, description, null, null, null, file);
+    }
+
+    @Transactional
+    public ResourceFileDto.Response updateFileMeta(Long id, ResourceFileDto.UpdateRequest request) {
+        ResourceFile file = resourceFileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다. ID: " + id));
+        if (request.getTitle() != null) {
+            file.setTitle(request.getTitle());
+        }
+        if (request.getDescription() != null) {
+            file.setDescription(request.getDescription());
+        }
+        if (request.getEventDate() != null) {
+            file.setEventDate(request.getEventDate());
+        }
+        return toResponse(resourceFileRepository.save(file));
     }
 
     public Page<ResourceFileDto.Response> getFilesByCategory(String category, int page, int size) {
@@ -215,6 +246,7 @@ public class ResourceFileService {
                 .description(file.getDescription())
                 .year(file.getYear())
                 .month(file.getMonth())
+                .eventDate(file.getEventDate())
                 .createdAt(file.getCreatedAt())
                 .build();
     }
