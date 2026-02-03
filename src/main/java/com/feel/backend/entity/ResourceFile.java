@@ -2,9 +2,7 @@ package com.feel.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -50,11 +48,7 @@ public class ResourceFile {
     @Column(name = "report_month")
     private Integer month;
 
-    /** 행사일 (갤러리 등). 사용자 화면에는 이 날짜만 표시 */
-    @Column(name = "event_date")
-    private LocalDate eventDate;
-
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    /** 등록/행사일. admin에서 행사일 입력 시 그 값, 미입력 시 업로드 시각 */
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 }

@@ -38,7 +38,6 @@ public class ResourceFileDto {
         private String description;
         private Integer year;
         private Integer month;
-        private LocalDate eventDate;
         private LocalDateTime createdAt;
     }
 

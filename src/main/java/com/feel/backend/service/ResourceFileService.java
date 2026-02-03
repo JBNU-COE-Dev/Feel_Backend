@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -91,7 +92,8 @@ public class ResourceFileService {
 
         String fileUrl = baseUrl + "/uploads/resources/" + category + "/" + storedFileName;
 
-        // DB 저장
+        // DB 저장 (행사일 입력 시 created_at에 반영, 없으면 업로드 시각)
+        LocalDateTime createdAt = eventDate != null ? eventDate.atStartOfDay() : LocalDateTime.now();
         ResourceFile resourceFile = ResourceFile.builder()
                 .category(category)
                 .originalFileName(originalFileName)
@@ -103,7 +105,7 @@ public class ResourceFileService {
                 .description(description)
                 .year(year)
                 .month(month)
-                .eventDate(eventDate)
+                .createdAt(createdAt)
                 .build();
 
         ResourceFile saved = resourceFileRepository.save(resourceFile);
@@ -144,7 +146,7 @@ public class ResourceFileService {
             file.setDescription(request.getDescription());
         }
         if (request.getEventDate() != null) {
-            file.setEventDate(request.getEventDate());
+            file.setCreatedAt(request.getEventDate().atStartOfDay());
         }
         return toResponse(resourceFileRepository.save(file));
     }
@@ -246,7 +248,6 @@ public class ResourceFileService {
                 .description(file.getDescription())
                 .year(file.getYear())
                 .month(file.getMonth())
-                .eventDate(file.getEventDate())
                 .createdAt(file.getCreatedAt())
                 .build();
     }
