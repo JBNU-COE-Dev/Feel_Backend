@@ -28,7 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://admin.feel-test.113.198.66.98.nip.io",
                 "http://api.feel-test.113.198.66.98.nip.io"
             )
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             .allowedHeaders("*")
             .allowCredentials(true)
             .maxAge(3600);
