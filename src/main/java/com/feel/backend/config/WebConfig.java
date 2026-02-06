@@ -25,7 +25,9 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://localhost:3001",
                 "http://localhost:5173",
                 "http://feel-test.113.198.66.98.nip.io",
+                "https://feel-test.113.198.66.98.nip.io",
                 "http://admin.feel-test.113.198.66.98.nip.io",
+                "https://admin.feel-test.113.198.66.98.nip.io",
                 "http://api.feel-test.113.198.66.98.nip.io"
             )
             .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
@@ -45,7 +47,9 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://localhost:3001",
                 "http://localhost:5173",
                 "http://feel-test.113.198.66.98.nip.io",
+                "https://feel-test.113.198.66.98.nip.io",
                 "http://admin.feel-test.113.198.66.98.nip.io",
+                "https://admin.feel-test.113.198.66.98.nip.io",
                 "http://api.feel-test.113.198.66.98.nip.io"
             )
             .allowedMethods("GET", "OPTIONS")
