@@ -2,8 +2,10 @@ package com.feel.backend.controller;
 
 import com.feel.backend.dto.ActivityPostRequestDto;
 import com.feel.backend.dto.ActivityPostResponseDto;
+import com.feel.backend.dto.ErrorResponse;
 import com.feel.backend.entity.ActivityCategory;
 import com.feel.backend.service.ActivityPostService;
+import com.feel.backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ActivityPostController {
 
     private final ActivityPostService activityPostService;
+    private final AuthService authService;
 
     /** 카테고리별 목록 조회 (페이징, 정렬: latest | deadline | viewCount) */
     @GetMapping
@@ -38,12 +41,24 @@ public class ActivityPostController {
         return ResponseEntity.ok(dto);
     }
 
-    /** 게시글 생성 (대외활동/공모전: Admin, 팀원모집: 로그인 사용자) */
+    /** 게시글 생성 (대외활동/공모전: Admin, 팀원모집: JWT 인증 필수) */
     @PostMapping
-    public ResponseEntity<ActivityPostResponseDto> create(
+    public ResponseEntity<?> create(
         @Valid @ModelAttribute ActivityPostRequestDto requestDto,
-        @RequestParam(required = false) MultipartFile thumbnail
+        @RequestParam(required = false) MultipartFile thumbnail,
+        @RequestHeader(value = "Authorization", required = false) String authHeader
     ) {
+        if (requestDto.getCategory() == ActivityCategory.TEAM_RECRUITMENT) {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message("팀원 모집 글 작성에는 로그인이 필요합니다.").build());
+            }
+            String token = authHeader.substring(7);
+            if (!authService.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message("유효하지 않은 토큰입니다. 다시 로그인해주세요.").build());
+            }
+        }
         ActivityPostResponseDto created = activityPostService.create(requestDto, thumbnail);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }

@@ -3,6 +3,7 @@ package com.feel.backend.service;
 import com.feel.backend.dto.LoginResponse;
 import com.feel.backend.entity.AdminUser;
 import com.feel.backend.repository.AdminUserRepository;
+import com.feel.backend.service.GoogleTokenVerifier.GoogleTokenInfo;
 import com.feel.backend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final AdminUserRepository adminUserRepository;
+    private final GoogleTokenVerifier googleTokenVerifier;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
@@ -48,5 +50,24 @@ public class AuthService {
     public void logout(String token) {
         // JWT는 stateless이므로 서버 측에서 별도 처리 불필요
         // 필요시 토큰 블랙리스트를 구현할 수 있음
+    }
+
+    /**
+     * Google ID 토큰으로 로그인 (@jbnu.ac.kr 도메인만 허용)
+     */
+    public LoginResponse googleLogin(String idToken) {
+        GoogleTokenInfo info = googleTokenVerifier.verify(idToken);
+        String email = info.getEmail();
+        if (email == null || email.isBlank()) {
+            throw new RuntimeException("이메일 정보를 가져올 수 없습니다.");
+        }
+        if (!GoogleTokenVerifier.isAllowedEmail(email)) {
+            throw new RuntimeException("전북대학교 웹메일(@jbnu.ac.kr)로만 로그인할 수 있습니다.");
+        }
+        String token = jwtUtil.generateToken(email);
+        return LoginResponse.builder()
+                .token(token)
+                .username(email)
+                .build();
     }
 }
