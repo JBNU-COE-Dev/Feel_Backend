@@ -43,6 +43,8 @@ public class ActivityPostRequestDto {
     private String applyUrl;
 
     // ---------- 팀원 모집 ----------
+    /** 모집 인원 (명) */
+    private Integer headcount;
     @Size(max = 500)
     private String recruitmentRoles;
     @Size(max = 500)

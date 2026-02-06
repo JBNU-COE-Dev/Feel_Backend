@@ -69,6 +69,7 @@ public class ActivityPostService {
             .startDate(dto.getStartDate())
             .endDate(dto.getEndDate())
             .applyUrl(dto.getApplyUrl())
+            .headcount(dto.getHeadcount())
             .recruitmentRoles(dto.getRecruitmentRoles())
             .contactUrl(dto.getContactUrl())
             .status(dto.getStatus())
@@ -90,6 +91,7 @@ public class ActivityPostService {
         post.setStartDate(dto.getStartDate());
         post.setEndDate(dto.getEndDate());
         post.setApplyUrl(dto.getApplyUrl());
+        post.setHeadcount(dto.getHeadcount());
         post.setRecruitmentRoles(dto.getRecruitmentRoles());
         post.setContactUrl(dto.getContactUrl());
         post.setStatus(dto.getStatus());

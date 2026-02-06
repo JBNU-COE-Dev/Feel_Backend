@@ -30,6 +30,7 @@ public class ActivityPostResponseDto {
     private LocalDate endDate;
     private String applyUrl;
 
+    private Integer headcount;
     private String recruitmentRoles;
     private String contactUrl;
     private RecruitmentStatus status;
@@ -49,6 +50,7 @@ public class ActivityPostResponseDto {
             .startDate(entity.getStartDate())
             .endDate(entity.getEndDate())
             .applyUrl(entity.getApplyUrl())
+            .headcount(entity.getHeadcount())
             .recruitmentRoles(entity.getRecruitmentRoles())
             .contactUrl(entity.getContactUrl())
             .status(entity.getStatus())

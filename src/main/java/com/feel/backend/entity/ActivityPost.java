@@ -68,6 +68,10 @@ public class ActivityPost {
     private String applyUrl;
 
     // ---------- 매칭 필드 (팀원 모집) ----------
+    /** 모집 인원 (명) */
+    @Column(name = "headcount")
+    private Integer headcount;
+
     /** 프론트/백엔드/기획 등 태그 (JSON 배열 또는 쉼표 구분 문자열) */
     @Column(name = "recruitment_roles", length = 500)
     private String recruitmentRoles;
