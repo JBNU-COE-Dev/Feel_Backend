@@ -16,10 +16,15 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
             .allowedOrigins(
+                "http://engsc.jbnu.ac.kr",
+                "https://engsc.jbnu.ac.kr",
+                "http://local-engsc.jbnu.ac.kr",
+                "https://local-engsc.jbnu.ac.kr",
                 "http://feel-test.com",
                 "https://feel-test.com",
                 "http://admin.feel-test.com",
                 "https://admin.feel-test.com",
+                "http://localhost",
                 "http://localhost:3000",
                 "https://localhost:3000",
                 "http://localhost:3001",
@@ -38,10 +43,15 @@ public class WebConfig implements WebMvcConfigurer {
         // 업로드된 이미지 파일 접근을 위한 CORS 설정
         registry.addMapping("/uploads/**")
             .allowedOrigins(
+                "http://engsc.jbnu.ac.kr",
+                "https://engsc.jbnu.ac.kr",
+                "http://local-engsc.jbnu.ac.kr",
+                "https://local-engsc.jbnu.ac.kr",
                 "http://feel-test.com",
                 "https://feel-test.com",
                 "http://admin.feel-test.com",
                 "https://admin.feel-test.com",
+                "http://localhost",
                 "http://localhost:3000",
                 "https://localhost:3000",
                 "http://localhost:3001",
