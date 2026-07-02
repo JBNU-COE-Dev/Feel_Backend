@@ -27,10 +27,6 @@ public class AuthService {
 
         boolean passwordMatches = passwordEncoder.matches(password, user.getPassword());
         if (!passwordMatches) {
-            // 디버깅을 위한 로그 (프로덕션에서는 제거)
-            System.err.println("비밀번호 검증 실패 - username: " + username);
-            System.err.println("저장된 해시: " + user.getPassword());
-            System.err.println("입력된 비밀번호와 매칭: " + passwordMatches);
             throw new RuntimeException("사용자명 또는 비밀번호가 올바르지 않습니다.");
         }
 

@@ -18,6 +18,8 @@ public class WebConfig implements WebMvcConfigurer {
             .allowedOrigins(
                 "http://engsc.jbnu.ac.kr",
                 "https://engsc.jbnu.ac.kr",
+                "http://engsc-admin.jbnu.ac.kr",
+                "https://engsc-admin.jbnu.ac.kr",
                 "http://local-engsc.jbnu.ac.kr",
                 "https://local-engsc.jbnu.ac.kr",
                 "http://feel-test.com",
@@ -46,6 +48,8 @@ public class WebConfig implements WebMvcConfigurer {
             .allowedOrigins(
                 "http://engsc.jbnu.ac.kr",
                 "https://engsc.jbnu.ac.kr",
+                "http://engsc-admin.jbnu.ac.kr",
+                "https://engsc-admin.jbnu.ac.kr",
                 "http://local-engsc.jbnu.ac.kr",
                 "https://local-engsc.jbnu.ac.kr",
                 "http://feel-test.com",
