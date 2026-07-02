@@ -16,29 +16,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // 관리자 계정이 없으면 생성, 있으면 비밀번호 업데이트
-        adminUserRepository.findByUsername("admin").ifPresentOrElse(
-            existingAdmin -> {
-                // 기존 계정이 있으면 비밀번호를 올바른 BCrypt 해시로 업데이트
-                String correctHash = passwordEncoder.encode("admin123");
-                // 비밀번호가 올바르게 해싱되어 있는지 확인
-                if (!passwordEncoder.matches("admin123", existingAdmin.getPassword())) {
-                    existingAdmin.setPassword(correctHash);
-                    adminUserRepository.save(existingAdmin);
-                    System.out.println("기존 관리자 계정의 비밀번호가 올바른 BCrypt 해시로 업데이트되었습니다.");
-                } else {
-                    System.out.println("관리자 계정이 이미 올바른 비밀번호 해시를 가지고 있습니다.");
-                }
-            },
-            () -> {
-                // 계정이 없으면 생성
-                AdminUser admin = AdminUser.builder()
-                        .username("admin")
-                        .password(passwordEncoder.encode("admin123"))
-                        .build();
-                adminUserRepository.save(admin);
-                System.out.println("기본 관리자 계정이 생성되었습니다. (username: admin, password: admin123)");
-            }
-        );
+        // Admin 계정 관리는 별도 관리자 개입으로 처리
+        // 자동 계정 생성 기능 제거 (보안상 이유)
     }
 }
