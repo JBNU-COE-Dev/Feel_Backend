@@ -39,7 +39,7 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://api.feel-test.113.198.66.98.nip.io"
             )
             .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-            .allowedHeaders("*")
+            .allowedHeaders("Content-Type", "Authorization")
             .allowCredentials(true)
             .maxAge(3600);
 
@@ -69,7 +69,7 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://api.feel-test.113.198.66.98.nip.io"
             )
             .allowedMethods("GET", "OPTIONS")
-            .allowedHeaders("*")
+            .allowedHeaders("Content-Type", "Authorization")
             .allowCredentials(true)
             .maxAge(3600);
     }

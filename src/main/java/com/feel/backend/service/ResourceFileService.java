@@ -138,7 +138,7 @@ public class ResourceFileService {
     @Transactional
     public ResourceFileDto.Response updateFileMeta(Long id, ResourceFileDto.UpdateRequest request) {
         ResourceFile file = resourceFileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다. ID: " + id));
+                .orElseThrow(() -> new RuntimeException("요청한 파일을 찾을 수 없습니다."));
         if (request.getTitle() != null) {
             file.setTitle(request.getTitle());
         }
@@ -172,14 +172,14 @@ public class ResourceFileService {
 
     public ResourceFileDto.Response getFileById(Long id) {
         ResourceFile file = resourceFileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다. ID: " + id));
+                .orElseThrow(() -> new RuntimeException("요청한 파일을 찾을 수 없습니다."));
         return toResponse(file);
     }
 
     @Transactional
     public void deleteFile(Long id) {
         ResourceFile file = resourceFileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다. ID: " + id));
+                .orElseThrow(() -> new RuntimeException("요청한 파일을 찾을 수 없습니다."));
 
         // 실제 파일 삭제
         Path filePath = Paths.get(uploadDir, "resources", file.getCategory(), file.getStoredFileName());
