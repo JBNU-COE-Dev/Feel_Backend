@@ -1,8 +1,11 @@
 package com.feel.backend.controller;
 
+import com.feel.backend.dto.ErrorResponse;
 import com.feel.backend.dto.PledgeProgressDto;
+import com.feel.backend.service.AuthService;
 import com.feel.backend.service.PledgeProgressService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +22,7 @@ import java.util.Map;
 public class PledgeProgressController {
 
     private final PledgeProgressService pledgeProgressService;
+    private final AuthService authService;
 
     /**
      * 전체 공약 이행 여부 조회 (ID -> completed)
@@ -34,9 +38,16 @@ public class PledgeProgressController {
      * PATCH /api/pledges/progress/{id}
      */
     @PatchMapping("/progress/{id}")
-    public ResponseEntity<PledgeProgressDto.ProgressResponse> updateProgress(
+    public ResponseEntity<?> updateProgress(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable String id,
             @RequestBody Map<String, Boolean> body) {
+        try {
+            authService.validateAuthHeader(authHeader);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
+        }
         Boolean completed = body != null ? body.get("completed") : null;
         return ResponseEntity.ok(pledgeProgressService.updateProgress(id, completed));
     }
@@ -46,8 +57,15 @@ public class PledgeProgressController {
      * PATCH /api/pledges/progress
      */
     @PatchMapping("/progress")
-    public ResponseEntity<PledgeProgressDto.ProgressResponse> updateProgressBatch(
+    public ResponseEntity<?> updateProgressBatch(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody PledgeProgressDto.BatchUpdateRequest body) {
+        try {
+            authService.validateAuthHeader(authHeader);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
+        }
         return ResponseEntity.ok(pledgeProgressService.updateProgressBatch(body.getProgress()));
     }
 }

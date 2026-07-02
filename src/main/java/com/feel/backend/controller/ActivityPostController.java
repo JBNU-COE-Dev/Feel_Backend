@@ -65,29 +65,52 @@ public class ActivityPostController {
 
     /** 게시글 수정 */
     @PutMapping("/{id}")
-    public ResponseEntity<ActivityPostResponseDto> update(
+    public ResponseEntity<?> update(
+        @RequestHeader(value = "Authorization", required = false) String authHeader,
         @PathVariable Long id,
         @Valid @ModelAttribute ActivityPostRequestDto requestDto,
         @RequestParam(required = false) MultipartFile thumbnail
     ) {
+        try {
+            authService.validateAuthHeader(authHeader);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
+        }
         ActivityPostResponseDto updated = activityPostService.update(id, requestDto, thumbnail);
         return ResponseEntity.ok(updated);
     }
 
     /** 게시글 수정 (일부 필드만) */
     @PatchMapping("/{id}")
-    public ResponseEntity<ActivityPostResponseDto> patch(
+    public ResponseEntity<?> patch(
+        @RequestHeader(value = "Authorization", required = false) String authHeader,
         @PathVariable Long id,
         @ModelAttribute ActivityPostRequestDto requestDto,
         @RequestParam(required = false) MultipartFile thumbnail
     ) {
+        try {
+            authService.validateAuthHeader(authHeader);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
+        }
         ActivityPostResponseDto updated = activityPostService.update(id, requestDto, thumbnail);
         return ResponseEntity.ok(updated);
     }
 
     /** 게시글 삭제 */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(
+        @RequestHeader(value = "Authorization", required = false) String authHeader,
+        @PathVariable Long id
+    ) {
+        try {
+            authService.validateAuthHeader(authHeader);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
+        }
         activityPostService.delete(id);
         return ResponseEntity.noContent().build();
     }

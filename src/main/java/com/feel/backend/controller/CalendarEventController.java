@@ -3,6 +3,7 @@ package com.feel.backend.controller;
 import com.feel.backend.dto.CalendarEventRequestDto;
 import com.feel.backend.dto.CalendarEventResponseDto;
 import com.feel.backend.dto.ErrorResponse;
+import com.feel.backend.service.AuthService;
 import com.feel.backend.service.CalendarEventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.List;
 public class CalendarEventController {
 
     private final CalendarEventService calendarEventService;
+    private final AuthService authService;
 
     // 전체 행사 일정 조회 (캐시 가능)
     @GetMapping("/all")
@@ -56,7 +58,16 @@ public class CalendarEventController {
 
     // 행사 일정 생성
     @PostMapping
-    public ResponseEntity<?> createEvent(@Valid @RequestBody CalendarEventRequestDto requestDto) {
+    public ResponseEntity<?> createEvent(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @Valid @RequestBody CalendarEventRequestDto requestDto
+    ) {
+        try {
+            authService.validateAuthHeader(authHeader);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
+        }
         try {
             CalendarEventResponseDto event = calendarEventService.createEvent(requestDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(event);
@@ -76,9 +87,16 @@ public class CalendarEventController {
     // 행사 일정 수정
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEvent(
-        @PathVariable Long id,
-        @Valid @RequestBody CalendarEventRequestDto requestDto
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @PathVariable Long id,
+            @Valid @RequestBody CalendarEventRequestDto requestDto
     ) {
+        try {
+            authService.validateAuthHeader(authHeader);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
+        }
         try {
             CalendarEventResponseDto event = calendarEventService.updateEvent(id, requestDto);
             return ResponseEntity.ok(event);
@@ -91,8 +109,8 @@ public class CalendarEventController {
             ErrorResponse errorResponse = ErrorResponse.builder()
                 .message(e.getMessage())
                 .build();
-            HttpStatus status = e.getMessage().contains("찾을 수 없습니다") 
-                ? HttpStatus.NOT_FOUND 
+            HttpStatus status = e.getMessage().contains("찾을 수 없습니다")
+                ? HttpStatus.NOT_FOUND
                 : HttpStatus.BAD_REQUEST;
             return ResponseEntity.status(status).body(errorResponse);
         }
@@ -100,7 +118,16 @@ public class CalendarEventController {
 
     // 행사 일정 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEvent(@PathVariable Long id) {
+    public ResponseEntity<?> deleteEvent(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @PathVariable Long id
+    ) {
+        try {
+            authService.validateAuthHeader(authHeader);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
+        }
         try {
             calendarEventService.deleteEvent(id);
             return ResponseEntity.noContent().build();

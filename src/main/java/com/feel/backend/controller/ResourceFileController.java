@@ -1,6 +1,8 @@
 package com.feel.backend.controller;
 
+import com.feel.backend.dto.ErrorResponse;
 import com.feel.backend.dto.ResourceFileDto;
+import com.feel.backend.service.AuthService;
 import com.feel.backend.service.ResourceFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,13 +21,15 @@ import java.util.Map;
 public class ResourceFileController {
 
     private final ResourceFileService resourceFileService;
+    private final AuthService authService;
 
     /**
      * 파일 업로드
      * POST /api/resources/upload
      */
     @PostMapping("/upload")
-    public ResponseEntity<ResourceFileDto.Response> uploadFile(
+    public ResponseEntity<?> uploadFile(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam String category,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String description,
@@ -34,6 +38,12 @@ public class ResourceFileController {
             @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate eventDate,
             @RequestParam MultipartFile file
     ) {
+        try {
+            authService.validateAuthHeader(authHeader);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
+        }
         ResourceFileDto.Response response = resourceFileService.uploadFile(
                 category, title, description, year, month, eventDate, file
         );
@@ -45,7 +55,8 @@ public class ResourceFileController {
      * POST /api/resources/upload-multiple
      */
     @PostMapping("/upload-multiple")
-    public ResponseEntity<List<ResourceFileDto.Response>> uploadMultipleFiles(
+    public ResponseEntity<?> uploadMultipleFiles(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestParam String category,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String description,
@@ -54,6 +65,12 @@ public class ResourceFileController {
             @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate eventDate,
             @RequestParam List<MultipartFile> files
     ) {
+        try {
+            authService.validateAuthHeader(authHeader);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
+        }
         List<ResourceFileDto.Response> responses = files.stream()
                 .map(file -> resourceFileService.uploadFile(category, title, description, year, month, eventDate, file))
                 .toList();
@@ -101,10 +118,17 @@ public class ResourceFileController {
      * PATCH /api/resources/{id}
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<ResourceFileDto.Response> updateFileMeta(
+    public ResponseEntity<?> updateFileMeta(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @PathVariable Long id,
             @RequestBody ResourceFileDto.UpdateRequest request
     ) {
+        try {
+            authService.validateAuthHeader(authHeader);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
+        }
         ResourceFileDto.Response response = resourceFileService.updateFileMeta(id, request);
         return ResponseEntity.ok(response);
     }
@@ -114,7 +138,16 @@ public class ResourceFileController {
      * DELETE /api/resources/{id}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFile(@PathVariable Long id) {
+    public ResponseEntity<?> deleteFile(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @PathVariable Long id
+    ) {
+        try {
+            authService.validateAuthHeader(authHeader);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
+        }
         resourceFileService.deleteFile(id);
         return ResponseEntity.noContent().build();
     }

@@ -67,6 +67,20 @@ public class AuthService {
         // 필요시 토큰 블랙리스트를 구현할 수 있음
     }
 
+    public String validateAuthHeader(String authHeader) {
+        if (authHeader == null || authHeader.isBlank()) {
+            throw new RuntimeException("인증 토큰이 필요합니다.");
+        }
+        if (!authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("유효하지 않은 토큰 형식입니다.");
+        }
+        String token = authHeader.substring(7);
+        if (!validateToken(token)) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+        return token;
+    }
+
     /**
      * Google ID 토큰으로 로그인 (@jbnu.ac.kr 도메인만 허용)
      * - 기존 사용자: JWT 발급
