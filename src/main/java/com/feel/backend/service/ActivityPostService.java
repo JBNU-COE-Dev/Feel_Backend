@@ -43,7 +43,7 @@ public class ActivityPostService {
     @Transactional
     public ActivityPostResponseDto getById(Long id) {
         ActivityPost post = activityPostRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("요청한 게시글을 찾을 수 없습니다.));
+            .orElseThrow(() -> new RuntimeException("요청한 게시글을 찾을 수 없습니다."));
         post.incrementViewCount();
         return ActivityPostResponseDto.fromEntity(post);
     }
@@ -81,7 +81,7 @@ public class ActivityPostService {
     @Transactional
     public ActivityPostResponseDto update(Long id, ActivityPostRequestDto dto, MultipartFile thumbnailFile) {
         ActivityPost post = activityPostRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("요청한 게시글을 찾을 수 없습니다.));
+            .orElseThrow(() -> new RuntimeException("요청한 게시글을 찾을 수 없습니다."));
 
         post.setCategory(dto.getCategory());
         post.setTitle(dto.getTitle());
@@ -113,7 +113,7 @@ public class ActivityPostService {
     @Transactional
     public void delete(Long id) {
         ActivityPost post = activityPostRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("요청한 게시글을 찾을 수 없습니다.));
+            .orElseThrow(() -> new RuntimeException("요청한 게시글을 찾을 수 없습니다."));
         if (post.getThumbnailUrl() != null) {
             String path = fileStorageService.extractFileName(post.getThumbnailUrl());
             fileStorageService.deleteFile(path);

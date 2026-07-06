@@ -59,7 +59,7 @@ public class CalendarEventService {
     // 특정 행사 일정 상세 조회
     public CalendarEventResponseDto getEventById(Long id) {
         CalendarEvent event = calendarEventRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("요청한 행사 일정을 찾을 수 없습니다.));
+            .orElseThrow(() -> new RuntimeException("요청한 행사 일정을 찾을 수 없습니다."));
         return CalendarEventResponseDto.fromEntity(event);
     }
 
@@ -85,7 +85,7 @@ public class CalendarEventService {
     @Transactional
     public CalendarEventResponseDto updateEvent(Long id, CalendarEventRequestDto requestDto) {
         CalendarEvent event = calendarEventRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("요청한 행사 일정을 찾을 수 없습니다.));
+            .orElseThrow(() -> new RuntimeException("요청한 행사 일정을 찾을 수 없습니다."));
 
         // 날짜 유효성 검증
         if (requestDto.getDateStart() != null && requestDto.getDateEnd() != null) {
@@ -116,7 +116,7 @@ public class CalendarEventService {
     @Transactional
     public void deleteEvent(Long id) {
         CalendarEvent event = calendarEventRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("요청한 행사 일정을 찾을 수 없습니다.));
+            .orElseThrow(() -> new RuntimeException("요청한 행사 일정을 찾을 수 없습니다."));
         calendarEventRepository.deleteById(id);
     }
 
