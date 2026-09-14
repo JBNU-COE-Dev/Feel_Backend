@@ -1,5 +1,6 @@
 package com.feel.backend.service;
 
+import com.feel.backend.auth.AuthRole;
 import com.feel.backend.dto.LoginResponse;
 import com.feel.backend.entity.AdminUser;
 import com.feel.backend.entity.User;
@@ -32,7 +33,7 @@ public class AuthService {
             throw new RuntimeException("사용자명 또는 비밀번호가 올바르지 않습니다.");
         }
 
-        String token = jwtUtil.generateToken(username);
+        String token = jwtUtil.generateToken(username, AuthRole.ADMIN);
 
         return LoginResponse.builder()
                 .token(token)
@@ -49,19 +50,23 @@ public class AuthService {
     }
 
     /**
-     * 토큰 검증 후 사용자 정보 반환 (username=email, nickname)
+     * 토큰 검증 후 사용자 정보 반환 (username=email, nickname, role)
      */
-    public record VerifyUserInfo(String username, String nickname) {}
+    public record VerifyUserInfo(String username, String nickname, AuthRole role) {}
 
     public VerifyUserInfo verifyAndGetUserInfo(String token) {
         if (!validateToken(token)) {
             throw new RuntimeException("유효하지 않은 토큰입니다.");
         }
+        AuthRole role = jwtUtil.getRoleFromToken(token);
+        if (role == null) {
+            throw new RuntimeException("유효하지 않은 토큰입니다. 다시 로그인해주세요.");
+        }
         String username = getUsernameFromToken(token);
         String nickname = userRepository.findByEmail(username)
                 .map(User::getNickname)
                 .orElse(null);
-        return new VerifyUserInfo(username, nickname);
+        return new VerifyUserInfo(username, nickname, role);
     }
 
     public void logout(String token) {
@@ -69,7 +74,35 @@ public class AuthService {
         // 필요시 토큰 블랙리스트를 구현할 수 있음
     }
 
+    /**
+     * Authorization 헤더 검증 후 ADMIN 전용. 기존 쓰기 API용.
+     */
     public String validateAuthHeader(String authHeader) {
+        return requireAdmin(authHeader);
+    }
+
+    public String requireAdmin(String authHeader) {
+        String token = extractAndValidateToken(authHeader);
+        AuthRole role = jwtUtil.getRoleFromToken(token);
+        if (role != AuthRole.ADMIN) {
+            throw new RuntimeException("관리자 권한이 필요합니다.");
+        }
+        return token;
+    }
+
+    /**
+     * 로그인 회원(USER) 또는 관리자(ADMIN) 허용.
+     */
+    public String requireUser(String authHeader) {
+        String token = extractAndValidateToken(authHeader);
+        AuthRole role = jwtUtil.getRoleFromToken(token);
+        if (role != AuthRole.USER && role != AuthRole.ADMIN) {
+            throw new RuntimeException("로그인이 필요합니다.");
+        }
+        return token;
+    }
+
+    private String extractAndValidateToken(String authHeader) {
         if (authHeader == null || authHeader.isBlank()) {
             throw new RuntimeException("인증 토큰이 필요합니다.");
         }
@@ -79,6 +112,9 @@ public class AuthService {
         String token = authHeader.substring(7);
         if (!validateToken(token)) {
             throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
+        if (jwtUtil.getRoleFromToken(token) == null) {
+            throw new RuntimeException("유효하지 않은 토큰입니다. 다시 로그인해주세요.");
         }
         return token;
     }
@@ -100,7 +136,7 @@ public class AuthService {
 
         return userRepository.findByEmail(email)
                 .map(user -> LoginResponse.builder()
-                        .token(jwtUtil.generateToken(email))
+                        .token(jwtUtil.generateToken(email, AuthRole.USER))
                         .username(email)
                         .nickname(user.getNickname())
                         .needSignup(false)
@@ -137,7 +173,7 @@ public class AuthService {
                 .build();
         userRepository.save(user);
 
-        String token = jwtUtil.generateToken(email);
+        String token = jwtUtil.generateToken(email, AuthRole.USER);
         return LoginResponse.builder()
                 .token(token)
                 .username(email)

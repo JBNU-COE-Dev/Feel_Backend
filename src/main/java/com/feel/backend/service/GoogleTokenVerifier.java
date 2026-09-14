@@ -30,16 +30,16 @@ public class GoogleTokenVerifier {
 
     @PostConstruct
     void init() {
-        GoogleIdTokenVerifier.Builder builder = new GoogleIdTokenVerifier.Builder(
+        if (!StringUtils.hasText(googleClientId)) {
+            throw new IllegalStateException(
+                    "app.google.client-id 가 비어 있습니다. Google OAuth Client ID를 설정하세요.");
+        }
+        this.verifier = new GoogleIdTokenVerifier.Builder(
                 new NetHttpTransport(),
                 GsonFactory.getDefaultInstance()
-        );
-        if (StringUtils.hasText(googleClientId)) {
-            builder.setAudience(Collections.singletonList(googleClientId.trim()));
-        } else {
-            log.warn("app.google.client-id 가 비어 있습니다. aud 검증을 건너뜁니다. 로컬 외에는 반드시 설정하세요.");
-        }
-        this.verifier = builder.build();
+        )
+                .setAudience(Collections.singletonList(googleClientId.trim()))
+                .build();
     }
 
     public GoogleTokenInfo verify(String idToken) {

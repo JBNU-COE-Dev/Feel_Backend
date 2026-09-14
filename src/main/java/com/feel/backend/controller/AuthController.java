@@ -77,6 +77,7 @@ public class AuthController {
                         .valid(true)
                         .username(verifyResult.username())
                         .nickname(verifyResult.nickname())
+                        .role(verifyResult.role().name())
                         .build();
                 return ResponseEntity.ok(response);
             } else {

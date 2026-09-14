@@ -41,23 +41,22 @@ public class ActivityPostController {
         return ResponseEntity.ok(dto);
     }
 
-    /** 게시글 생성 (대외활동/공모전: Admin, 팀원모집: JWT 인증 필수) */
+    /** 게시글 생성 (대외활동/공모전: Admin, 팀원모집: USER 또는 ADMIN) */
     @PostMapping
     public ResponseEntity<?> create(
         @Valid @ModelAttribute ActivityPostRequestDto requestDto,
         @RequestParam(required = false) MultipartFile thumbnail,
         @RequestHeader(value = "Authorization", required = false) String authHeader
     ) {
-        if (requestDto.getCategory() == ActivityCategory.TEAM_RECRUITMENT) {
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ErrorResponse.builder().message("팀원 모집 글 작성에는 로그인이 필요합니다.").build());
+        try {
+            if (requestDto.getCategory() == ActivityCategory.TEAM_RECRUITMENT) {
+                authService.requireUser(authHeader);
+            } else {
+                authService.requireAdmin(authHeader);
             }
-            String token = authHeader.substring(7);
-            if (!authService.validateToken(token)) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ErrorResponse.builder().message("유효하지 않은 토큰입니다. 다시 로그인해주세요.").build());
-            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.builder().message(e.getMessage()).build());
         }
         ActivityPostResponseDto created = activityPostService.create(requestDto, thumbnail);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
