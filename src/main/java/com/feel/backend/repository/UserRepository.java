@@ -1,7 +1,11 @@
 package com.feel.backend.repository;
 
 import com.feel.backend.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -12,4 +16,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByNickname(String nickname);
+
+    @Query("""
+        SELECT u FROM User u
+        WHERE (:search IS NULL OR :search = ''
+           OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%'))
+           OR LOWER(u.nickname) LIKE LOWER(CONCAT('%', :search, '%')))
+        ORDER BY u.createdAt DESC
+        """)
+    Page<User> search(@Param("search") String search, Pageable pageable);
 }

@@ -22,6 +22,7 @@ public class ActivityPostResponseDto {
     private String thumbnailUrl;
     private Integer viewCount;
     private String author;
+    private Long authorId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -44,6 +45,7 @@ public class ActivityPostResponseDto {
             .thumbnailUrl(entity.getThumbnailUrl())
             .viewCount(entity.getViewCount() != null ? entity.getViewCount() : 0)
             .author(entity.getAuthor())
+            .authorId(entity.getAuthorId())
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .organization(entity.getOrganization())

@@ -75,6 +75,7 @@ public class AuthController {
                 var verifyResult = authService.verifyAndGetUserInfo(token);
                 VerifyResponse response = VerifyResponse.builder()
                         .valid(true)
+                        .id(verifyResult.id())
                         .username(verifyResult.username())
                         .nickname(verifyResult.nickname())
                         .role(verifyResult.role().name())

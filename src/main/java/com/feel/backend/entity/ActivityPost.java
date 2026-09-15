@@ -46,6 +46,10 @@ public class ActivityPost {
     @Column(nullable = false, length = 100)
     private String author;
 
+    /** users.id. 팀원모집 작성자 FK. 대외활동/공모전(admin)은 null */
+    @Column(name = "author_id")
+    private Long authorId;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

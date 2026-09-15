@@ -8,6 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class LoginResponse {
+    /** users 테이블 PK (일반 회원). ADMIN 로그인은 null */
+    private Long id;
     private String token;
     private String username;
     private String nickname;

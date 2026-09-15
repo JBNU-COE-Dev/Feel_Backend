@@ -21,4 +21,8 @@ public interface ActivityPostRepository extends JpaRepository<ActivityPost, Long
 
     @Query("SELECT a FROM ActivityPost a WHERE (:category IS NULL OR a.category = :category) ORDER BY a.createdAt DESC")
     Page<ActivityPost> findByCategoryOrderByCreatedAtDesc(@Param("category") ActivityCategory category, Pageable pageable);
+
+    Page<ActivityPost> findByAuthorIdOrderByCreatedAtDesc(Long authorId, Pageable pageable);
+
+    long countByAuthorId(Long authorId);
 }

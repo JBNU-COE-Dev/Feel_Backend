@@ -50,9 +50,10 @@ public class AuthService {
     }
 
     /**
-     * 토큰 검증 후 사용자 정보 반환 (username=email, nickname, role)
+     * 토큰 검증 후 사용자 정보 반환 (username=email, nickname, role, id)
+     * id는 USER일 때만 users PK. ADMIN은 null.
      */
-    public record VerifyUserInfo(String username, String nickname, AuthRole role) {}
+    public record VerifyUserInfo(String username, String nickname, AuthRole role, Long id) {}
 
     public VerifyUserInfo verifyAndGetUserInfo(String token) {
         if (!validateToken(token)) {
@@ -63,10 +64,12 @@ public class AuthService {
             throw new RuntimeException("유효하지 않은 토큰입니다. 다시 로그인해주세요.");
         }
         String username = getUsernameFromToken(token);
-        String nickname = userRepository.findByEmail(username)
-                .map(User::getNickname)
-                .orElse(null);
-        return new VerifyUserInfo(username, nickname, role);
+        if (role == AuthRole.USER) {
+            User user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+            return new VerifyUserInfo(username, user.getNickname(), role, user.getId());
+        }
+        return new VerifyUserInfo(username, null, role, null);
     }
 
     public void logout(String token) {
@@ -100,6 +103,40 @@ public class AuthService {
             throw new RuntimeException("로그인이 필요합니다.");
         }
         return token;
+    }
+
+    public AuthRole getRole(String authHeader) {
+        String token = extractAndValidateToken(authHeader);
+        return jwtUtil.getRoleFromToken(token);
+    }
+
+    /**
+     * Authorization 헤더에서 현재 일반 회원(User)을 조회.
+     * ADMIN 토큰이면 users 테이블에 없으므로 예외.
+     */
+    public User resolveCurrentUser(String authHeader) {
+        String token = requireUser(authHeader);
+        AuthRole role = jwtUtil.getRoleFromToken(token);
+        if (role != AuthRole.USER) {
+            throw new RuntimeException("일반 회원만 사용할 수 있습니다.");
+        }
+        String email = getUsernameFromToken(token);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+    }
+
+    /**
+     * USER면 User 엔티티, ADMIN이면 null.
+     */
+    public User resolveCurrentUserOrNullForAdmin(String authHeader) {
+        String token = requireUser(authHeader);
+        AuthRole role = jwtUtil.getRoleFromToken(token);
+        if (role == AuthRole.ADMIN) {
+            return null;
+        }
+        String email = getUsernameFromToken(token);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
     }
 
     private String extractAndValidateToken(String authHeader) {
@@ -136,6 +173,7 @@ public class AuthService {
 
         return userRepository.findByEmail(email)
                 .map(user -> LoginResponse.builder()
+                        .id(user.getId())
                         .token(jwtUtil.generateToken(email, AuthRole.USER))
                         .username(email)
                         .nickname(user.getNickname())
@@ -175,6 +213,7 @@ public class AuthService {
 
         String token = jwtUtil.generateToken(email, AuthRole.USER);
         return LoginResponse.builder()
+                .id(user.getId())
                 .token(token)
                 .username(email)
                 .nickname(user.getNickname())

@@ -26,7 +26,7 @@ public class ActivityPostRequestDto {
     @NotBlank(message = "내용은 필수입니다.")
     private String content;
 
-    @NotBlank(message = "작성자는 필수입니다.")
+    /** 대외활동/공모전: 필수. 팀원모집: 서버가 JWT 회원 닉네임으로 설정 */
     @Size(max = 100)
     private String author;
 
