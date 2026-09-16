@@ -4,6 +4,16 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      no_cache:
+        description: '캐시 없이 빌드'
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-${{ github.repository }}
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -11,29 +21,71 @@ jobs:
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          NO_CACHE: ${{ inputs.no_cache }}
         with:
           host: ${{ secrets.JCLOUD_SSH_HOST }}
           username: ${{ secrets.JCLOUD_SSH_USER }}
           key: ${{ secrets.JCLOUD_SSH_KEY }}
           port: ${{ secrets.JCLOUD_SSH_PORT }}
+          envs: NO_CACHE
           script: |
             set -e
-              cd /home/ubuntu/Feel_Backend
+            REPO_DIR=/home/ubuntu/Feel_Backend
+            COMPOSE_FILE=/home/ubuntu/docker-compose.yml
+            SERVICE=backend
+            WAIT_SEC=30
 
-              echo "=== 현재 브랜치 및 origin ==="
-              git branch -a
-              git remote -v
+            cd "$REPO_DIR" || { echo "ERR: $REPO_DIR 없음"; exit 1; }
 
-              echo "=== main 최신화 ==="
-              git fetch origin main
-              git reset --hard origin/main
-              git pull origin main
+            echo "=== main 최신화 ==="
+            git fetch --prune origin main
+            git checkout -B main origin/main
+            echo "빌드할 커밋: $(git log -1 --oneline)"
 
-              if docker compose build backend; then
-                docker compose up -d --force-recreate backend
-                docker image prune -f
-                echo "=== 배포 완료 ==="
-            else
-                echo "ERR: docker compose build failed"
-                exit 1
+            BUILD_OPTS=""
+            if [ "$NO_CACHE" = "true" ]; then
+              BUILD_OPTS="--no-cache"
             fi
+
+            echo "=== 빌드 ==="
+            docker compose -f "$COMPOSE_FILE" build $BUILD_OPTS "$SERVICE"
+
+            echo "=== 컨테이너 교체 ==="
+            docker compose -f "$COMPOSE_FILE" up -d --force-recreate "$SERVICE"
+
+            echo "=== 기동 확인 (${WAIT_SEC}초 대기) ==="
+            sleep "$WAIT_SEC"
+
+            CID=$(docker compose -f "$COMPOSE_FILE" ps -q "$SERVICE")
+            if [ -z "$CID" ]; then
+              echo "ERR: $SERVICE 컨테이너를 찾을 수 없음 — 최근 로그 100줄"
+              docker compose -f "$COMPOSE_FILE" logs --tail=100 "$SERVICE"
+              exit 1
+            fi
+
+            STATUS=$(docker inspect -f '{{.State.Status}}' "$CID")
+            RESTARTS=$(docker inspect -f '{{.RestartCount}}' "$CID")
+            RESTARTS=${RESTARTS:-0}
+            echo "status=$STATUS, 재시작=${RESTARTS}회"
+
+            if [ "$STATUS" != "running" ] || [ "$RESTARTS" -gt 0 ]; then
+              echo "ERR: $SERVICE 비정상 (status=$STATUS, 재시작=${RESTARTS}회) — 최근 로그 100줄"
+              docker compose -f "$COMPOSE_FILE" logs --tail=100 "$SERVICE"
+              exit 1
+            fi
+
+            echo "=== API 응답 확인 ==="
+            if ! docker exec "$CID" curl -fsS -o /dev/null --max-time 5 \
+                 "http://localhost:8080/api/notices?page=0&size=1"; then
+              echo "ERR: 컨테이너는 살아 있으나 API 응답 없음 — 최근 로그 100줄"
+              docker compose -f "$COMPOSE_FILE" logs --tail=100 "$SERVICE"
+              exit 1
+            fi
+
+            echo "=== nginx 업스트림 갱신 ==="
+            docker compose -f "$COMPOSE_FILE" exec -T nginx nginx -s reload \
+              || echo "WARN: nginx reload 실패 — 502 발생 시 'docker compose restart nginx' 필요"
+
+            docker image prune -f
+            echo "=== 배포 완료: $SERVICE 정상 기동 ==="
