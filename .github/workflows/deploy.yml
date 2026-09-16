@@ -18,6 +18,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -29,14 +30,40 @@ jobs:
           key: ${{ secrets.JCLOUD_SSH_KEY }}
           port: ${{ secrets.JCLOUD_SSH_PORT }}
           envs: NO_CACHE
+          command_timeout: 20m
           script: |
             set -e
             REPO_DIR=/home/ubuntu/Feel_Backend
             COMPOSE_FILE=/home/ubuntu/docker-compose.yml
+            ENV_FILE=/home/ubuntu/.env
             SERVICE=backend
             WAIT_SEC=30
 
+            # 세 레포(backend/user-front/admin)가 같은 서버의 같은 compose 프로젝트를
+            # 건드린다. GitHub의 concurrency는 레포 단위라 레포 간 동시 실행을 막지
+            # 못하므로 서버에서 잠근다.
+            exec 9>/tmp/feel-deploy.lock
+            flock -w 300 9 || { echo "ERR: 다른 배포가 진행 중 (5분 대기 초과)"; exit 1; }
+
+            # --env-file을 명시해 cwd와 무관하게 항상 같은 .env를 읽게 한다.
+            compose() { compose --env-file "$ENV_FILE" "$@"; }
+
+            # 키가 비어 있어도 compose는 경고만 내고 빈 문자열로 넘긴다.
+            require_env() {
+              for v in "$@"; do
+                grep -qE "^[[:space:]]*${v}=.+" "$ENV_FILE" \
+                  || { echo "ERR: $ENV_FILE 에 ${v} 없음 또는 빈 값"; exit 1; }
+              done
+            }
+
             cd "$REPO_DIR" || { echo "ERR: $REPO_DIR 없음"; exit 1; }
+            [ -f "$ENV_FILE" ] || { echo "ERR: $ENV_FILE 없음"; exit 1; }
+
+            echo "=== .env 필수 키 확인 ==="
+            require_env MYSQL_DATABASE MYSQL_ROOT_PASSWORD DB_USERNAME DB_PASSWORD \
+                        SPRING_PROFILES_ACTIVE APP_BASE_URL APP_GOOGLE_CLIENT_ID \
+                        JWT_SECRET ADMIN_USERNAME ADMIN_PASSWORD TZ
+            echo "OK"
 
             echo "=== main 최신화 ==="
             git fetch --prune origin main
@@ -49,18 +76,18 @@ jobs:
             fi
 
             echo "=== 빌드 ==="
-            docker compose -f "$COMPOSE_FILE" build $BUILD_OPTS "$SERVICE"
+            compose build $BUILD_OPTS "$SERVICE"
 
             echo "=== 컨테이너 교체 ==="
-            docker compose -f "$COMPOSE_FILE" up -d --force-recreate "$SERVICE"
+            compose up -d --force-recreate "$SERVICE"
 
             echo "=== 기동 확인 (${WAIT_SEC}초 대기) ==="
             sleep "$WAIT_SEC"
 
-            CID=$(docker compose -f "$COMPOSE_FILE" ps -q "$SERVICE")
+            CID=$(compose ps -q "$SERVICE")
             if [ -z "$CID" ]; then
               echo "ERR: $SERVICE 컨테이너를 찾을 수 없음 — 최근 로그 100줄"
-              docker compose -f "$COMPOSE_FILE" logs --tail=100 "$SERVICE"
+              compose logs --tail=100 "$SERVICE"
               exit 1
             fi
 
@@ -71,20 +98,23 @@ jobs:
 
             if [ "$STATUS" != "running" ] || [ "$RESTARTS" -gt 0 ]; then
               echo "ERR: $SERVICE 비정상 (status=$STATUS, 재시작=${RESTARTS}회) — 최근 로그 100줄"
-              docker compose -f "$COMPOSE_FILE" logs --tail=100 "$SERVICE"
+              compose logs --tail=100 "$SERVICE"
               exit 1
             fi
 
             echo "=== API 응답 확인 ==="
-            if ! docker exec "$CID" curl -fsS -o /dev/null --max-time 5 \
-                 "http://localhost:8080/api/notices?page=0&size=1"; then
+            # busybox wget은 해석된 주소 중 하나만 시도하고 폴백하지 않는다.
+            # localhost는 ::1로도 해석되는데 Spring은 IPv4만 바인딩하므로
+            # 127.0.0.1을 직접 쓴다.
+            if ! docker exec "$CID" wget -q -T 5 -O /dev/null \
+                 "http://127.0.0.1:8080/api/notices?page=0&size=1"; then
               echo "ERR: 컨테이너는 살아 있으나 API 응답 없음 — 최근 로그 100줄"
-              docker compose -f "$COMPOSE_FILE" logs --tail=100 "$SERVICE"
+              compose logs --tail=100 "$SERVICE"
               exit 1
             fi
 
             echo "=== nginx 업스트림 갱신 ==="
-            docker compose -f "$COMPOSE_FILE" exec -T nginx nginx -s reload \
+            compose exec -T nginx nginx -s reload \
               || echo "WARN: nginx reload 실패 — 502 발생 시 'docker compose restart nginx' 필요"
 
             docker image prune -f

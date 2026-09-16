@@ -11,8 +11,7 @@ RUN --mount=type=cache,target=/root/.m2 \
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-RUN apk add --no-cache curl \
-    && mkdir -p /app/uploads && chmod 755 /app/uploads
+RUN mkdir -p /app/uploads && chmod 755 /app/uploads
 
 COPY --from=build /app/target/*.jar app.jar
 
@@ -22,6 +21,6 @@ EXPOSE 8080
 
 # 서비스 상태 체크 (실제 존재하는 엔드포인트여야 함)
 # HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-#   CMD curl -f http://localhost:8080/api/notices?page=0&size=1 || exit 1
+#   CMD wget -q -O /dev/null "http://127.0.0.1:8080/api/notices?page=0&size=1" || exit 1
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
