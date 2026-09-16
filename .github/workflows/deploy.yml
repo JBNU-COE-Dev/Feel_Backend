@@ -46,7 +46,7 @@ jobs:
             flock -w 300 9 || { echo "ERR: 다른 배포가 진행 중 (5분 대기 초과)"; exit 1; }
 
             # --env-file을 명시해 cwd와 무관하게 항상 같은 .env를 읽게 한다.
-            compose() { compose --env-file "$ENV_FILE" "$@"; }
+            compose() { docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" "$@"; }
 
             # 키가 비어 있어도 compose는 경고만 내고 빈 문자열로 넘긴다.
             require_env() {
